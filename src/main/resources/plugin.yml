@@ -1,0 +1,55 @@
+name: SafeLamp
+version: '${version}'
+main: com.dierks.safelamp.SafeLampPlugin
+api-version: '1.21'
+description: A magical lamp that despawns hostile mobs around the holder. Perfect for family servers.
+author: Dierks27
+website: https://github.com/Dierks27/SafeLamp
+commands:
+  safelamp:
+    description: SafeLamp admin commands
+    usage: /safelamp <give|reload|info>
+    permission: safelamp.give
+permissions:
+  safelamp.use.1:
+    description: Can be protected by a Tier 1 Safe Lamp
+    default: true
+  safelamp.use.2:
+    description: Can be protected by a Tier 2 Safe Lantern
+    default: true
+  safelamp.use.3:
+    description: Can be protected by a Tier 3 Safe Beacon
+    default: true
+  safelamp.use.4:
+    description: Can be protected by a Tier 4 Safe Torch
+    default: true
+  safelamp.craft.1:
+    description: Can craft Tier 1 Safe Lamp
+    default: true
+  safelamp.craft.2:
+    description: Can craft Tier 2 Safe Lantern
+    default: true
+  safelamp.craft.3:
+    description: Can craft Tier 3 Safe Beacon
+    default: true
+  safelamp.craft.4:
+    description: Can craft Tier 4 Safe Torch
+    default: true
+  safelamp.place.1:
+    description: Can place a Tier 1 Safe Lamp as a block
+    default: true
+  safelamp.place.2:
+    description: Can place a Tier 2 Safe Lantern as a block
+    default: true
+  safelamp.place.3:
+    description: Can place a Tier 3 Safe Beacon as a block
+    default: true
+  safelamp.place.4:
+    description: Can place a Tier 4 Safe Torch as a block
+    default: true
+  safelamp.give:
+    description: Can use /safelamp give
+    default: op
+  safelamp.reload:
+    description: Can use /safelamp reload
+    default: op
