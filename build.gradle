@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.dierks.safelamp'
+version = '1.0.0'
+description = 'SafeLamp — a magical lamp that despawns hostile mobs around the holder.'
+
+// Target server: Paper 26.2 / Java 25. The toolchain is pinned to 25 so the
+// bytecode matches the live server exactly. paper-api 26.2 is itself compiled
+// for Java 25, so compiling with `release = 21` is not possible against it —
+// the plugin still RUNS on any Paper 26.2 server, which requires Java 25 anyway.
+// If JDK 25 is not installed, Gradle provisions it via the foojay resolver
+// (see settings.gradle).
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        // paper-api is published ONLY here (not on Maven Central).
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    // Paper 26.2 API, pinned to a verified-good build for reproducibility.
+    // A floating 'build.+' selector always grabs the newest published 26.2
+    // build; when one of those comes down corrupt on CI ("zip END header not
+    // found") the whole compile classpath vanishes. Pin an exact build and
+    // bump it deliberately.
+    compileOnly 'io.papermc.paper:paper-api:26.2.build.107-stable'
+}
+
+def targetJavaVersion = 25
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(targetJavaVersion)
+}
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties(props)
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand(props)
+    }
+}
+
+// SafeLamp has zero runtime dependencies, so the plain `jar` task already
+// produces the shippable artifact — no shadow/relocation step is needed.
+jar {
+    archiveBaseName.set('SafeLamp')
+}

@@ -1,0 +1,189 @@
+# ══════════════════════════════════════════════════════════════════════════════
+#  SafeLamp
+#  A magical lamp that despawns hostile mobs around whoever carries it — or
+#  around wherever it is placed.
+#
+#  Drop the plugin in and it works. Most servers never need to touch this file.
+#  Edit it and run /safelamp reload to apply changes without restarting.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─── Lamp Tiers ───
+# Four tiers, smallest to largest. Every tier can be switched off independently:
+# set `enabled: false` and that lamp stops protecting anyone, its recipe is not
+# registered, and it cannot be placed as a block. Existing ones become inert
+# decorations rather than disappearing.
+#
+# Want only the small one? Turn off tiers 2, 3 and 4.
+# Want only the big base light? Turn off tiers 1, 2 and 3.
+#
+#   enabled        — does this tier work at all?
+#   radius         — protection radius in blocks (a true sphere, not a cube)
+#   display-name   — item name, '&' colour codes
+#   recipe-enabled — register the crafting recipe? (ignored when enabled: false)
+lamps:
+  # Tier 1 — Safe Lamp (Lantern). The starter lamp: cheap, small bubble.
+  tier1:
+    enabled: true
+    radius: 10
+    display-name: "&e✦ Safe Lamp ✦"
+    recipe-enabled: true
+
+  # Tier 2 — Safe Lantern (Soul Lantern). Crafted from a Tier 1.
+  tier2:
+    enabled: true
+    radius: 25
+    display-name: "&b✦ Safe Lantern ✦"
+    recipe-enabled: true
+
+  # Tier 3 — Safe Beacon (Beacon). Crafted from a Tier 2.
+  tier3:
+    enabled: true
+    radius: 50
+    display-name: "&d✦ Safe Beacon ✦"
+    recipe-enabled: true
+
+  # Tier 4 — Safe Torch (Soul Torch). The endgame home/spawn light: crafted from
+  # a Tier 3, and meant to be PLACED and left alone rather than carried.
+  tier4:
+    enabled: true
+    radius: 100
+    display-name: "&6✦ Safe Torch ✦"
+    recipe-enabled: true
+
+# ─── Scan Settings ───
+# How often to check for hostile mobs (in ticks, 20 ticks = 1 second)
+scan-interval: 40    # 2 seconds — good balance of performance vs responsiveness
+
+# ─── Where the lamp has to be to work ───
+# carry-mode decides WHERE a player must be carrying the lamp for it to protect
+# them. Pick one:
+#
+#   INVENTORY  — anywhere in the backpack or hotbar (plus the offhand, see
+#                check-offhand below). Easiest for young players: pick the lamp
+#                up once and forget about it. This is the default.
+#   HAND       — only while it is held in the main hand or the offhand.
+#   MAIN_HAND  — only while it is actually held in the main hand. The strictest
+#                option: the player must put the lamp away to let mobs spawn,
+#                which keeps it a deliberate choice rather than a passive buff.
+#
+# Armor slots and ender chests never count in any mode.
+carry-mode: INVENTORY
+
+# Does the offhand slot count? Applies to INVENTORY and HAND modes.
+# (Ignored in MAIN_HAND mode, which by definition only looks at the main hand.)
+check-offhand: true
+
+# ─── Placed Lamps ───
+# Lamps also work when PLACED as a block. Plant one at spawn or in the family
+# base and it holds the area clear with nobody carrying anything. Break it and
+# you get the lamp item back.
+#
+# Placed lamps refuse to be destroyed by explosions, pistons or flowing water,
+# so an expensive lamp cannot vanish to a stray creeper.
+placed-lamps:
+  enabled: true
+
+  # Multiply the tier's radius when placed. 1.0 = same as carrying it.
+  # Raise it to make a spawn lamp cover more ground; lower it to make carrying
+  # the lamp the better option.
+  radius-multiplier: 1.0
+
+  # Placed lamps survive explosions. Turn this off to let TNT and creepers
+  # destroy them like any other block (the lamp item is then lost).
+  explosion-proof: true
+
+# ─── Mob Despawn List ───
+# These mob types WILL be despawned near lamps.
+# Everything NOT on this list is safe (animals, villagers, etc.)
+# Uses Bukkit EntityType names: https://jd.papermc.io/paper/org/bukkit/entity/EntityType.html
+despawn-mobs:
+  - ZOMBIE
+  - SKELETON
+  - CREEPER
+  - SPIDER
+  - CAVE_SPIDER
+  - WITCH
+  - PHANTOM
+  - DROWNED
+  - HUSK
+  - STRAY
+  - ZOMBIE_VILLAGER
+  - SILVERFISH
+  - ENDERMITE
+  - SLIME
+  - MAGMA_CUBE
+  - BLAZE
+  - GHAST
+  - WITHER_SKELETON
+  - PIGLIN_BRUTE
+  - VINDICATOR
+  - PILLAGER
+  - RAVAGER
+  - VEX
+  - EVOKER
+  - GUARDIAN
+  - ELDER_GUARDIAN
+  - ENDERMAN
+  - SHULKER
+  - HOGLIN
+  - ZOGLIN
+  - WARDEN
+  - BREEZE
+  - BOGGED
+
+# ─── Protection: mobs the lamp must never touch ───
+# Despawned mobs are deleted outright — no death, no drops, no XP, no sound.
+# That is the point (a creeper near a six-year-old should just stop existing),
+# but it also means anything deleted by mistake is gone for good. These settings
+# are what keep that from happening.
+
+# Mobs with custom names (name tags) are NEVER despawned, regardless of the list
+# above. Most boss and custom-mob plugins name their mobs, so leaving this on is
+# the single most important protection here.
+protect-named-mobs: true
+
+# Boss mobs — the Ender Dragon, the Wither, and anything the server reports as a
+# boss — are never despawned while this is false. Leave it false: a lamp should
+# not be a one-click way to delete a boss and skip the fight, the loot and the
+# return portal. Turning it on logs a warning at every startup.
+allow-boss-despawn: false
+
+# Protect any mob with more max health than this. 0 disables the check.
+#
+# This is the guard for CUSTOM bosses. A boss plugin's boss is usually a
+# reskinned vanilla mob — a ZOMBIE with 4000 health and a boss bar — so it looks
+# like an ordinary despawnable zombie to the list above. The default of 500 is
+# exactly a Warden's health, so no vanilla mob is ever protected by it.
+#
+# RUNNING A BOSS PLUGIN? Lower this to just above your toughest ordinary mob
+# (100 is a good starting point) so custom bosses are left alone.
+protect-above-max-health: 500
+
+# Mobs tagged by these plugins are never despawned. The match is on the
+# namespace of any persistent-data key the mob carries, which is how boss and
+# custom-mob plugins mark their own entities. Add your boss plugin's namespace
+# here — harmless if the plugin is not installed.
+protect-tagged-mobs:
+  - mythicmobs
+  - mythiclib
+  - elitemobs
+  - infernalmobs
+  - levelledmobs
+
+# Mobs that are riding something, or being ridden, are never despawned.
+# This is not configurable — removing half of a ride leaves the rest broken.
+
+# ─── Effects ───
+# Show a small smoke puff when a mob is despawned
+particles: true
+
+# Show an action bar message when the lamp first activates
+activation-message: true
+
+# ─── World Settings ───
+# Which worlds the lamp works in. Empty list = ALL worlds.
+# Use this to disable lamps in specific worlds (e.g. a PvP arena).
+enabled-worlds: []
+
+# Which worlds the lamp is DISABLED in. Takes priority over enabled-worlds.
+disabled-worlds: []
