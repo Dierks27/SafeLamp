@@ -248,6 +248,12 @@ public final class DespawnTask implements Runnable {
 
     /** Every reason a mob may or may not be removed, in cheapest-check-first order. */
     private boolean shouldDespawn(Entity entity, LampConfig config) {
+        // Overlapping lamps see the same mob twice in one pass. Without this the
+        // second lamp would puff particles at an already-deleted mob and count it
+        // again in the despawn total.
+        if (!entity.isValid()) {
+            return false;
+        }
         if (!(entity instanceof LivingEntity living) || entity instanceof Player) {
             return false;
         }
