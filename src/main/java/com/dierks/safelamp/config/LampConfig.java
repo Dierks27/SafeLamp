@@ -83,6 +83,23 @@ public final class LampConfig {
     private static final int[] DEFAULT_RADIUS = {10, 25, 50, 100};
 
     /**
+     * The despawn list shipped in config.yml, duplicated here as a fallback.
+     *
+     * <p>Used only when {@code despawn-mobs} is missing entirely — which is what
+     * an older config file looks like after an upgrade that adds the key. Without
+     * this the plugin would load happily and protect nobody. An admin who
+     * genuinely wants nothing despawned can still set the key to an empty list;
+     * that is respected (with a warning), because it was written deliberately.</p>
+     */
+    private static final List<String> DEFAULT_DESPAWN_MOBS = List.of(
+            "ZOMBIE", "SKELETON", "CREEPER", "SPIDER", "CAVE_SPIDER", "WITCH", "PHANTOM",
+            "DROWNED", "HUSK", "STRAY", "ZOMBIE_VILLAGER", "SILVERFISH", "ENDERMITE",
+            "SLIME", "MAGMA_CUBE", "BLAZE", "GHAST", "WITHER_SKELETON", "PIGLIN_BRUTE",
+            "VINDICATOR", "PILLAGER", "RAVAGER", "VEX", "EVOKER", "GUARDIAN",
+            "ELDER_GUARDIAN", "ENDERMAN", "SHULKER", "HOGLIN", "ZOGLIN", "WARDEN",
+            "BREEZE", "BOGGED");
+
+    /**
      * One tier's resolved settings.
      *
      * @param level             1 through {@link #MAX_TIER}
@@ -207,8 +224,17 @@ public final class LampConfig {
             placedMultiplier = 1.0D;
         }
 
+        boolean despawnListWritten = cfg.isSet("despawn-mobs");
+        List<String> rawDespawnList = despawnListWritten
+                ? cfg.getStringList("despawn-mobs")
+                : DEFAULT_DESPAWN_MOBS;
+        if (!despawnListWritten) {
+            log.warning("despawn-mobs is missing from config.yml — falling back to the"
+                    + " built-in hostile-mob list. Add the key back to customise it.");
+        }
+
         Set<EntityType> despawn = new HashSet<>();
-        for (String raw : cfg.getStringList("despawn-mobs")) {
+        for (String raw : rawDespawnList) {
             if (raw == null || raw.isBlank()) {
                 continue;
             }
@@ -251,8 +277,8 @@ public final class LampConfig {
         }
 
         if (despawn.isEmpty()) {
-            log.warning("despawn-mobs is empty, so lamps will not remove anything."
-                    + " Delete the key to restore the built-in hostile-mob list.");
+            log.warning("despawn-mobs resolved to nothing, so lamps will not remove any mob."
+                    + " If that was not intended, check the entity names in config.yml.");
         }
 
         return new LampConfig(
